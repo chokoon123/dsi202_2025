@@ -10,8 +10,7 @@ class StrayAnimal(models.Model):
     # --- Choices ---
     SPECIES_CHOICES = [
         ('dog', 'Dog'),
-        ('cat', 'Cat'),
-    ]
+        ('cat', 'Cat'),    ]
 
     AGE_UNIT_CHOICES = [
         ('day', 'Day(s)'),
@@ -86,31 +85,27 @@ class StrayAnimal(models.Model):
         ('30+', '30+'),
     ]
 
-    pet_id = models.CharField(max_length=30, unique=True)
-    name = models.CharField(max_length=100)
-    breed = models.CharField(max_length=100)
-    species = models.CharField(max_length=10, choices=SPECIES_CHOICES)
-    age_value = models.PositiveIntegerField()
-    age_unit = models.CharField(max_length=10, choices=AGE_UNIT_CHOICES)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    size = models.CharField(max_length=20, choices=SIZE_CHOICES)
-    coat_length = models.CharField(max_length=20, choices=COAT_LENGTH_CHOICES)
-    good_with = MultiSelectField(
-        choices=GOOD_WITH_CHOICES,
-        blank=True,
-        max_length=50,
-        verbose_name="Good with"
-    )
-    color = models.CharField(max_length=50, choices=COLOR_CHOICES)
-    care_and_behavior = models.CharField(max_length=50, choices=CARE_CHOICES)
-    days_on_pawpal = models.CharField(max_length=10, choices=DAYS_ON_PAWPAL_CHOICES)
+    pet_id = models.CharField(max_length=30, unique=True, blank=True)
+    name = models.CharField(max_length=100, blank=True)
+    breed = models.CharField(max_length=100, blank=True)
+    species = models.CharField(max_length=10, choices=SPECIES_CHOICES, default='dog', blank=True)
+    age_value = models.PositiveIntegerField(blank=True)
+    age_unit = models.CharField(max_length=10, choices=AGE_UNIT_CHOICES, default='day', blank=True)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, default='male', blank=True)
+    size = models.CharField(max_length=20, choices=SIZE_CHOICES, default='small', blank=True)
+    coat_length = models.CharField(max_length=20, choices=COAT_LENGTH_CHOICES, default='short', blank=True)
+    good_with = models.CharField(max_length=255, blank=True)
+
+    color = models.CharField(max_length=50, choices=COLOR_CHOICES, default='Apricot / Beige', blank=True)
+    care_and_behavior = models.CharField(max_length=50, choices=CARE_CHOICES, default='House-trained', blank=True)
+    days_on_pawpal = models.CharField(max_length=10, choices=DAYS_ON_PAWPAL_CHOICES, default='Any', blank=True)
     location = models.CharField(max_length=100, blank=True)
     image = models.ImageField(upload_to='animal_images/', blank=True, null=True)
     story_describe = models.TextField(blank=True)
-    behavior = models.CharField(max_length=50, choices=BEHAVIOR_CHOICES)
+    behavior = models.CharField(max_length=50, choices=BEHAVIOR_CHOICES, default='Anxiety', blank=True)
     health_status = models.TextField(blank=True)
-    is_adopted = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    is_adopted = models.BooleanField(default=False, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True)
 
     def get_age_in_years(self):
         if self.age_unit == 'day':
@@ -133,11 +128,13 @@ class StrayAnimal(models.Model):
             return "Senior"
         
     def save(self, *args, **kwargs):
-        if not self.pet_id:
-            prefix = 'D' if self.species == 'Dog' else 'C'
+        if not self.pet_id and self.species in ['dog', 'cat']:
+            prefix = 'D' if self.species == 'dog' else 'C'
             count = StrayAnimal.objects.filter(species=self.species).count() + 1
-            self.pet_id = f"{prefix}{count:03d}"  # D001, C002
-        super(StrayAnimal, self).save(*args, **kwargs)
+            self.pet_id = f"{prefix}{count:03d}"
+
+        super().save(*args, **kwargs)
+
 
     def __str__(self):
         return f"{self.name} - {self.breed} ({self.pet_id})"

@@ -35,7 +35,7 @@ urlpatterns = [
     path('signup/', views.signup_view, name='signup'),
     path('personality/', views.personality_test_view, name='personality_test'),
     path('pet/<int:pet_id>/', views.pet_detail, name='pet_detail')
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

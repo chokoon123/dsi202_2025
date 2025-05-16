@@ -1,7 +1,8 @@
-from django.urls import path
-from . import views
+from django.urls import path , include
+from . import views 
 
 urlpatterns = [
+    # path('', include("pawpal.urls")),
     path('', views.homepage, name='homepage'),
     path('adopt/', views.adopt, name='adopt'),
     path('donate/', views.donate, name='donate'),
